@@ -62,6 +62,19 @@ public partial class ServiceJsonRpcDescriptor
 		{
 			Requires.NotNull(target, nameof(target));
 
+			if (additionalInterfaces.Length > 0)
+			{
+				Type targetType = target.GetType();
+				// Make sure the target implements all of the specified additional interfaces.
+				foreach (var t in additionalInterfaces)
+				{
+					if (!t.IsAssignableFrom(targetType))
+					{
+						return default;
+					}
+				}
+			}
+
 			TypeInfo proxyType = Get(typeof(T), additionalInterfaces);
 			try
 			{
