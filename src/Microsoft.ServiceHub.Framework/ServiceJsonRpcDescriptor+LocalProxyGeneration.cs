@@ -3,10 +3,11 @@
 
 // Uncomment the SaveAssembly symbol and run one test to save the generated DLL for inspection in ILSpy as part of debugging.
 #if NETFRAMEWORK
-////#define SaveAssembly
+#define SaveAssembly
 #endif
 
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
@@ -78,6 +79,8 @@ public partial class ServiceJsonRpcDescriptor
 			TypeInfo proxyType = Get(typeof(T), additionalInterfaces);
 			try
 			{
+				Debugger.Launch();
+				Debugger.Break();
 				T? result = (T?)Activator.CreateInstance(proxyType, target, exceptionStrategy);
 				if (result is null)
 				{
@@ -131,6 +134,7 @@ public partial class ServiceJsonRpcDescriptor
 
 		private static AssemblyBuilder CreateProxyAssemblyBuilder(ImmutableHashSet<AssemblyName> assemblies)
 		{
+			Debugger.Launch();
 			var proxyAssemblyName = new AssemblyName(string.Format(CultureInfo.InvariantCulture, "localRpcProxies_{0}", GenerateGuidFromAssemblies(assemblies)));
 #if SaveAssembly
 			return AssemblyBuilder.DefineDynamicAssembly(proxyAssemblyName, AssemblyBuilderAccess.RunAndSave);
@@ -300,6 +304,7 @@ public partial class ServiceJsonRpcDescriptor
 
 			il.Emit(OpCodes.Ret);
 
+			Debugger.Launch();
 			if (additionalInterfaces.Length > 0)
 			{
 				// throwException: throw new InvalidCastException();
